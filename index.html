@@ -1,281 +1,62 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Projeto Sobrevivência 3D — Protótipo</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#101526">
+<title>ÉTERION — Protótipo RPG</title>
 <style>
-  :root{color-scheme:dark}
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#87b8df;font-family:system-ui,-apple-system,Arial,sans-serif;touch-action:none}
-  #game{position:fixed;inset:0}
-  canvas{display:block;width:100%;height:100%}
-  #hud{position:fixed;inset:0;pointer-events:none;color:#fff;text-shadow:0 2px 4px #000}
-  .panel{background:#101820b8;border:1px solid #ffffff55;border-radius:10px;padding:8px 11px;backdrop-filter:blur(4px)}
-  #brand{position:absolute;top:12px;left:12px;font-weight:900;letter-spacing:1px;font-size:13px}
-  #status{position:absolute;top:12px;right:12px;font-size:12px;text-align:right}
-  #help{position:absolute;top:60px;left:12px;max-width:240px;font-size:12px;line-height:1.4}
-  #crosshair{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);font-size:25px;font-weight:300}
-  #bottom{position:absolute;left:12px;bottom:15px;width:180px}
-  #healthLabel{font-size:12px;margin-bottom:5px}
-  #healthOuter{height:9px;background:#0009;border:1px solid #ffffff88;border-radius:8px;overflow:hidden}
-  #health{height:100%;width:100%;background:#70e080}
-  #joystick{position:absolute;left:22px;bottom:26px;width:118px;height:118px;border-radius:50%;background:#09131b55;border:2px solid #ffffff66;pointer-events:auto;touch-action:none}
-  #stick{position:absolute;left:34px;top:34px;width:46px;height:46px;border-radius:50%;background:#eaf3ffb8;border:2px solid white;box-shadow:0 2px 8px #0008}
-  .action{position:absolute;pointer-events:auto;touch-action:none;border:2px solid #ffffffaa;border-radius:50%;background:#10182099;color:white;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px #0006}
-  #fire{right:24px;bottom:42px;width:78px;height:78px;background:#b83b2fbb;font-size:13px}
-  #jump{right:112px;bottom:114px;width:54px;height:54px;font-size:11px}
-  #crouch{right:115px;bottom:49px;width:50px;height:50px;font-size:10px}
-  #lookHint{position:absolute;right:14px;top:48%;font-size:10px;opacity:.8;text-align:right}
-  #toast{position:absolute;left:50%;top:30%;transform:translateX(-50%);font-size:14px;font-weight:800;white-space:nowrap}
-  @media(min-width:800px){#joystick{width:132px;height:132px}#stick{left:40px;top:40px}#help{max-width:300px;font-size:13px}}
-</style>
-</head>
-<body>
-<div id="game"></div>
-<div id="hud">
-  <div id="brand" class="panel">PROJETO SOBREVIVÊNCIA <span style="color:#a9e77b">3D</span></div>
-  <div id="status" class="panel">PROTÓTIPO 01<br><span id="targetsText">Alvos: 5</span></div>
-  <div id="help" class="panel">Explore o cenário. Use o controle para andar e arraste o lado direito da tela para girar a câmera. Acerte os alvos vermelhos para testar os disparos.</div>
-  <div id="crosshair">+</div>
-  <div id="lookHint">ARRASTE PARA<br>GIRAR A CÂMERA</div>
-  <div id="bottom"><div id="healthLabel">VIDA <span id="healthNum">100</span>%</div><div id="healthOuter"><div id="health"></div></div></div>
-  <div id="toast"></div>
-  <div id="joystick"><div id="stick"></div></div>
-  <button id="fire" class="action">DISPARAR</button>
-  <button id="jump" class="action">PULAR</button>
-  <button id="crouch" class="action">AGACHAR</button>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101526;color:#f4f3ff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;touch-action:none}canvas{display:block;width:100%;height:100%;touch-action:none}.hud{position:fixed;inset:0;pointer-events:none}.panel{background:linear-gradient(135deg,rgba(17,24,44,.94),rgba(29,34,61,.82));border:1px solid rgba(167,151,255,.34);border-radius:13px;box-shadow:0 6px 24px #0005;backdrop-filter:blur(5px)}.stats{position:absolute;top:env(safe-area-inset-top,8px);left:8px;width:min(235px,62vw);padding:10px}.brand{font-weight:900;letter-spacing:2px;color:#c6b9ff;font-size:14px}.small{font-size:11px;color:#b8bdd7}.bar{height:8px;background:#272c44;border-radius:8px;margin-top:5px;overflow:hidden}.fill{height:100%;width:100%;border-radius:8px;transition:width .15s}.hp{background:linear-gradient(90deg,#ef476f,#ff8b9d)}.mp{background:linear-gradient(90deg,#4b8bff,#a18bff)}.xp{background:linear-gradient(90deg,#f6c453,#fff0a6)}.quest{position:absolute;top:env(safe-area-inset-top,8px);right:8px;width:min(210px,48vw);padding:10px;text-align:left}.quest b{font-size:12px;color:#ffdf8c}.quest div{font-size:11px;line-height:1.35;color:#e0e3f7;margin-top:4px}.bottom{position:absolute;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);display:flex;justify-content:space-between;align-items:flex-end}.stick{width:116px;height:116px;border-radius:50%;border:1px solid #c2bbff66;background:#161c35a8;position:relative;pointer-events:auto;touch-action:none}.knob{position:absolute;left:50%;top:50%;width:46px;height:46px;border-radius:50%;transform:translate(-50%,-50%);background:linear-gradient(145deg,#b4a4ff,#6759be);box-shadow:0 3px 14px #0008;border:2px solid #e2dcff}.actions{display:grid;grid-template-columns:repeat(2,64px);gap:9px;pointer-events:auto}.act{width:64px;height:64px;border-radius:50%;border:1px solid #c8bcff88;background:linear-gradient(145deg,#34345fdd,#171c36ee);color:#fff;font-weight:800;font-size:11px;box-shadow:0 4px 14px #0006;touch-action:manipulation}.act span{display:block;font-size:21px;margin-bottom:1px}.act.primary{background:linear-gradient(145deg,#825dff,#4937a7);border-color:#d9caff}.toast{position:absolute;left:50%;top:25%;transform:translateX(-50%);padding:10px 14px;max-width:86vw;text-align:center;font-size:13px;opacity:0;transition:opacity .2s}.toast.show{opacity:1}.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;background:#11172de8;padding:20px;border:1px solid #9385ee77;border-radius:18px;width:min(340px,88vw);pointer-events:auto}.center h1{margin:0;color:#c8baff;letter-spacing:3px}.center p{font-size:13px;line-height:1.45;color:#d5d9ef}.start{border:0;border-radius:12px;padding:12px 20px;background:linear-gradient(90deg,#8063ff,#b47cff);color:white;font-weight:900;font-size:15px}.hidden{display:none}.tip{position:absolute;bottom:138px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;color:#e4e1ff;background:#151a32b8;border-radius:20px;padding:5px 9px}
+@media(min-width:700px){.bottom{left:24px;right:24px}.stick{width:132px;height:132px}.actions{grid-template-columns:repeat(2,74px)}.act{width:74px;height:74px}.stats{width:260px}.quest{width:240px}}
+</style></head>
+<body><canvas id="game"></canvas>
+<div class="hud"><div class="stats panel"><div class="brand">ÉTERION <span style="font-size:10px;color:#fff8;letter-spacing:1px">• PROTÓTIPO</span></div><div class="small" id="level">Vínculo do Éter · Nível 1</div><div class="small">VIDA <b id="hpnum">100/100</b></div><div class="bar"><div class="fill hp" id="hpbar"></div></div><div class="small" style="margin-top:5px">MANA <b id="mpnum">100/100</b></div><div class="bar"><div class="fill mp" id="mpbar"></div></div><div class="small" style="margin-top:5px">EXPERIÊNCIA</div><div class="bar"><div class="fill xp" id="xpbar" style="width:0%"></div></div></div>
+<div class="quest panel"><b>✦ MISSÃO: CRISTAL PERDIDO</b><div id="questText">Encontre o Cristal Primordial azul na floresta.</div><div style="color:#b9b0ff;margin-top:6px">Fragmentos: <b id="frags">0/3</b></div></div>
+<div class="toast panel" id="toast">Bem-vindo a Éterion</div>
+<div class="tip" id="tip">Use o controle para andar • toque MAGIA para lançar</div>
+<div class="bottom"><div class="stick" id="stick"><div class="knob" id="knob"></div></div><div class="actions"><button class="act" id="dash"><span>➤</span>ESQUIVA</button><button class="act primary" id="spell"><span>✧</span>MAGIA</button><button class="act" id="pulse"><span>◉</span>EXPLOSÃO</button><button class="act" id="potion"><span>✚</span>POÇÃO</button></div></div>
+<div class="center" id="intro"><h1>ÉTERION</h1><p>O Éter está corrompido. Explore a floresta antiga, derrote criaturas sombrias e recupere os fragmentos do Cristal Primordial.</p><p><b>Protótipo jogável</b><br>Movimento, magia, inimigos, experiência e missão.</p><button class="start" id="start">ENTRAR NO REINO</button></div>
+<div class="center hidden" id="win"><h1>CRISTAL RESTAURADO</h1><p>Você recuperou os fragmentos e trouxe um pouco de luz de volta a Éterion.</p><button class="start" id="again">CONTINUAR EXPLORANDO</button></div>
 </div>
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
-
-const root=document.querySelector('#game');
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x87b9e5);
-scene.fog=new THREE.Fog(0x87b9e5,65,180);
-const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,400);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
-renderer.setSize(innerWidth,innerHeight);
-renderer.shadowMap.enabled=true;
-renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-root.appendChild(renderer.domElement);
-
-scene.add(new THREE.HemisphereLight(0xd9efff,0x596044,2.0));
-const sun=new THREE.DirectionalLight(0xfff1d5,3.0);
-sun.position.set(-35,55,20);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
-sun.shadow.camera.left=-70;sun.shadow.camera.right=70;sun.shadow.camera.top=70;sun.shadow.camera.bottom=-70;
-scene.add(sun);
-
-const mat=(color,roughness=.9)=>new THREE.MeshStandardMaterial({color,roughness});
-const groundMat=mat(0x777b50);
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(260,260,1,1),groundMat);
-ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
-
-function box(w,h,d,color,x,y,z,collide=true){
- const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color));
- m.position.set(x,y+h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);
- if(collide) obstacles.push({x,z,rx:w/2,rz:d/2});
- return m;
+<script>
+(()=>{
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');let W=innerWidth,H=innerHeight,DPR=1;
+function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);canvas.width=W*DPR;canvas.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0)}addEventListener('resize',resize);resize();
+const ui=id=>document.getElementById(id);let started=false,won=false,last=0,elapsed=0,toastTimer=0;
+const world={w:1900,h:1500};const player={x:world.w/2,y:world.h/2+220,r:15,hp:100,maxhp:100,mp:100,maxmp:100,xp:0,level:1,frags:0,faceX:0,faceY:-1,inv:0};let enemies=[],crystals=[],particles=[],trees=[],keys={},stick={x:0,y:0,active:false};
+let cam={x:0,y:0};function rand(a,b){return a+Math.random()*(b-a)}
+function reset(){player.x=world.w/2;player.y=world.h/2+220;player.hp=100;player.mp=100;player.xp=0;player.level=1;player.frags=0;player.inv=0;enemies=[];crystals=[];particles=[];trees=[];won=false;
+for(let i=0;i<34;i++){let x=rand(70,world.w-70),y=rand(70,world.h-70);if(Math.hypot(x-player.x,y-player.y)>180)trees.push({x,y,r:rand(18,34),shade:rand(0,1)})}
+for(let i=0;i<10;i++){let x=rand(100,world.w-100),y=rand(100,world.h-100);if(Math.hypot(x-player.x,y-player.y)<220){x=rand(100,world.w-100);y=rand(100,world.h-100)}enemies.push({x,y,r:15,hp:42,maxhp:42,speed:rand(30,48),cool:rand(.2,1),hit:0})}
+for(let i=0;i<3;i++){let a=rand(0,Math.PI*2),d=rand(220,570);crystals.push({x:Math.max(55,Math.min(world.w-55,player.x+Math.cos(a)*d)),y:Math.max(55,Math.min(world.h-55,player.y+Math.sin(a)*d)),got:false,p:rand(0,6)})}updateUI()}
+function notify(s){ui('toast').textContent=s;ui('toast').classList.add('show');toastTimer=2.2}
+function burst(x,y,color,n=12){for(let i=0;i<n;i++)particles.push({x,y,vx:rand(-100,100),vy:rand(-100,100),life:rand(.25,.75),max:.75,color,r:rand(2,5)})}
+function updateUI(){ui('hpnum').textContent=Math.ceil(player.hp)+'/'+player.maxhp;ui('mpnum').textContent=Math.floor(player.mp)+'/'+player.maxmp;ui('hpbar').style.width=100*player.hp/player.maxhp+'%';ui('mpbar').style.width=100*player.mp/player.maxmp+'%';ui('xpbar').style.width=(player.xp/100*100)+'%';ui('level').textContent='Vínculo do Éter · Nível '+player.level;ui('frags').textContent=player.frags+'/3';ui('questText').textContent=player.frags>=3?'Missão concluída! Explore e derrote as criaturas restantes.':'Encontre os '+(3-player.frags)+' fragmento(s) do Cristal Primordial.'}
+function moveVec(){let x=stick.x,y=stick.y;if(keys.ArrowLeft||keys.a)x-=1;if(keys.ArrowRight||keys.d)x+=1;if(keys.ArrowUp||keys.w)y-=1;if(keys.ArrowDown||keys.s)y+=1;let l=Math.hypot(x,y);return l>1?{x:x/l,y:y/l}:{x,y}}
+function cast(big=false){if(!started)return;let cost=big?35:14;if(player.mp<cost){notify('Mana insuficiente!');return}player.mp-=cost;let range=big?170:220,damage=big?55:30;burst(player.x+player.faceX*25,player.y+player.faceY*25,big?'#ffbd69':'#85caff',big?30:15);let hits=0;for(let e of enemies){if(e.hp<=0)continue;let dx=e.x-player.x,dy=e.y-player.y,dist=Math.hypot(dx,dy);if(big?dist<range:dist<range&&((dx*player.faceX+dy*player.faceY)/(dist||1))>.2){e.hp-=damage;e.hit=.2;burst(e.x,e.y,'#b28aff',8);hits++;if(e.hp<=0){player.xp+=25;burst(e.x,e.y,'#f4d17b',20)}}}if(hits)notify(big?'Explosão arcana! '+hits+' alvo(s) atingido(s).':'Magia acertou '+hits+' criatura(s).');if(player.xp>=100){player.xp-=100;player.level++;player.maxhp+=15;player.hp=player.maxhp;player.maxmp+=10;player.mp=player.maxmp;notify('NÍVEL '+player.level+' alcançado!')}updateUI()}
+function dodge(){if(!started)return;let v=moveVec();if(Math.hypot(v.x,v.y)<.1){v={x:player.faceX,y:player.faceY}}player.x=Math.max(25,Math.min(world.w-25,player.x+v.x*105));player.y=Math.max(25,Math.min(world.h-25,player.y+v.y*105));player.inv=.5;burst(player.x,player.y,'#9b8bff',10)}
+function potion(){if(player.hp>=player.maxhp){notify('Sua vida já está cheia.');return}player.hp=Math.min(player.maxhp,player.hp+40);notify('Poção usada: +40 de vida');burst(player.x,player.y,'#ff719e',14);updateUI()}
+function draw(){ctx.clearRect(0,0,W,H);let targetX=player.x-W*.5,targetY=player.y-H*.5;cam.x+=(Math.max(0,Math.min(world.w-W,targetX))-cam.x)*.12;cam.y+=(Math.max(0,Math.min(world.h-H,targetY))-cam.y)*.12;ctx.save();ctx.translate(-cam.x,-cam.y);
+// magical forest ground
+ctx.fillStyle='#172b2b';ctx.fillRect(0,0,world.w,world.h);for(let y=0;y<world.h;y+=72){for(let x=0;x<world.w;x+=72){ctx.fillStyle=((x/72+y/72)%2<1)?'#1b3330':'#1a302e';ctx.fillRect(x,y,70,70);if((x*7+y*3)%5===0){ctx.fillStyle='#344b3a';ctx.globalAlpha=.45;ctx.fillRect(x+rand(5,60),y+rand(5,60),2,3);ctx.globalAlpha=1}}}
+// path
+ctx.strokeStyle='#665b49';ctx.lineWidth=92;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(70,world.h-120);ctx.bezierCurveTo(460,world.h-200,350,world.h/2,world.w/2,world.h/2);ctx.bezierCurveTo(world.w*.65,world.h*.45,world.w*.7,300,world.w-100,100);ctx.stroke();ctx.strokeStyle='#89795a';ctx.lineWidth=2;ctx.setLineDash([10,15]);ctx.stroke();ctx.setLineDash([]);
+for(let t of trees){let x=t.x,y=t.y;ctx.fillStyle='#101d20';ctx.beginPath();ctx.ellipse(x,y+13,t.r*.9,t.r*.45,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=t.shade>.5?'#244d42':'#285744';ctx.beginPath();ctx.arc(x,y,t.r,0,Math.PI*2);ctx.fill();ctx.fillStyle='#3b6d4f';ctx.beginPath();ctx.arc(x-t.r*.25,y-t.r*.25,t.r*.55,0,Math.PI*2);ctx.fill();ctx.fillStyle='#9bca8d';ctx.globalAlpha=.5;ctx.beginPath();ctx.arc(x-t.r*.25,y-t.r*.25,3,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}
+for(let c of crystals){if(c.got)continue;c.p+=.035;let y=c.y+Math.sin(c.p)*5;ctx.save();ctx.translate(c.x,y);ctx.shadowBlur=22;ctx.shadowColor='#56cfff';ctx.fillStyle='#6ce3ff';ctx.beginPath();ctx.moveTo(0,-19);ctx.lineTo(12,0);ctx.lineTo(0,19);ctx.lineTo(-12,0);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#dcfaff';ctx.stroke();ctx.restore()}
+for(let e of enemies){if(e.hp<=0)continue;ctx.fillStyle='#0d111c88';ctx.beginPath();ctx.ellipse(e.x,e.y+11,17,8,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=e.hit>0?'#e5d5ff':'#55436f';ctx.beginPath();ctx.arc(e.x,e.y,15,0,Math.PI*2);ctx.fill();ctx.fillStyle='#aa7dcb';ctx.beginPath();ctx.arc(e.x-4,e.y-4,6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ff6e9a';ctx.fillRect(e.x-12,e.y-23,24,4);ctx.fillStyle='#a6f4c1';ctx.fillRect(e.x-12,e.y-23,24*Math.max(0,e.hp/e.maxhp),4);ctx.fillStyle='#ffb3d0';ctx.fillRect(e.x-6,e.y-3,3,3);ctx.fillRect(e.x+4,e.y-3,3,3)}
+// player shadow, robe, head, staff and magic orb
+ctx.fillStyle='#0a1318aa';ctx.beginPath();ctx.ellipse(player.x,player.y+13,18,9,0,0,Math.PI*2);ctx.fill();ctx.save();ctx.translate(player.x,player.y);ctx.rotate(Math.atan2(player.faceY,player.faceX)+Math.PI/2);ctx.fillStyle=player.inv>0?'#fff':'#4d3f9c';ctx.beginPath();ctx.moveTo(-13,-3);ctx.lineTo(0,-10);ctx.lineTo(13,-3);ctx.lineTo(11,17);ctx.lineTo(-11,17);ctx.closePath();ctx.fill();ctx.fillStyle='#b6a0ff';ctx.beginPath();ctx.moveTo(-8,1);ctx.lineTo(0,12);ctx.lineTo(8,1);ctx.lineTo(5,16);ctx.lineTo(-5,16);ctx.closePath();ctx.fill();ctx.fillStyle='#e7c6a5';ctx.beginPath();ctx.arc(0,-13,8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#34264e';ctx.beginPath();ctx.arc(0,-16,8,Math.PI,Math.PI*2);ctx.fill();ctx.strokeStyle='#d6caff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(13,-2);ctx.lineTo(19,18);ctx.stroke();ctx.fillStyle='#79e8ff';ctx.shadowBlur=12;ctx.shadowColor='#68e8ff';ctx.beginPath();ctx.arc(19,-5,5,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.restore();
+for(let p of particles){ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}ctx.restore();
+// light vignette and compass-ish marker
+let g=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.15,W/2,H/2,Math.max(W,H)*.7);g.addColorStop(0,'#0000');g.addColorStop(1,'#060a19aa');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
 }
-const obstacles=[];
-/* compound buildings */
-box(17,5,12,0x777a79,12,0,-18);
-box(17.4,1.1,12.4,0x9c4938,12,5,-18,false);
-box(9,4,8,0x6d777a,31,0,-13);
-box(10,6,9,0xb5a78b,-25,0,-27);
-box(8,1,9,0x51483b,-25,6,-27,false);
-/* doors and windows */
-box(.2,2,2,0x302b25,12,0,-11.85,false);
-for(const [x,z] of [[7,-11.85],[17,-11.85],[8,-24.15],[16,-24.15]]){
- box(1.5,1.3,.12,0x293f49,x,2.5,z,false);
-}
-/* crates */
-for(const [x,z] of [[2,-8],[5,-8],[22,-7],[24,-9],[3,-24],[20,-24],[-7,-15],[-11,-19],[34,-25]]){
- box(1.7,1.6,1.7,0x79583b,x,0,z);
- box(1.72,.12,1.72,0x4a392b,x,1.6,z,false);
-}
-/* coastal water and cliff */
-const sea=new THREE.Mesh(new THREE.PlaneGeometry(260,65),new THREE.MeshStandardMaterial({color:0x176f9d,roughness:.35,metalness:.1}));
-sea.rotation.x=-Math.PI/2;sea.position.set(0,-.15,-82);scene.add(sea);
-box(260,4,9,0x8e876b,0,-1,-47,false);
-/* tower */
-const towerMat=mat(0x464d50);
-function beam(a,b,r=.12){
- const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),dir=new THREE.Vector3().subVectors(B,A);
- const mesh=new THREE.Mesh(new THREE.CylinderGeometry(r*.72,r,dir.length(),5),towerMat);
- mesh.position.copy(A).add(B).multiplyScalar(.5);mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());mesh.castShadow=true;scene.add(mesh);
-}
-for(let y=1;y<22;y+=5){
- beam([-20,y,-38],[-14,y+5,-38]);beam([-14,y+5,-38],[-8,y,-38]);
- beam([-20,y,-38],[-8,y,-38],.09);
-}
-beam([-14,0,-38],[-14,23,-38],.16);
-beam([-24,13,-38],[-4,13,-38],.13);
-beam([-22,18,-38],[-6,18,-38],.13);
-for(let y=2;y<20;y+=4)beam([-20,y,-38],[-8,y+4,-38],.07);
-
-/* simple trees */
-for(const [x,z,s] of [[-40,-10,1.4],[-35,-35,1.1],[-4,-38,1.2],[39,-32,1.4],[43,-2,1.1],[-42,12,1.3],[36,17,1.2],[-33,25,1.4],[0,18,1.1]]){
- const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.22*s,.35*s,2.4*s,7),mat(0x57402b));trunk.position.set(x,1.2*s,z);trunk.castShadow=true;scene.add(trunk);
- const crown=new THREE.Mesh(new THREE.SphereGeometry(2.2*s,8,7),mat(0x3f6c3d));crown.position.set(x,3.1*s,z);crown.castShadow=true;scene.add(crown);
-}
-/* grass tufts */
-const grassMat=mat(0x8c965b);
-for(let i=0;i<180;i++){
- const x=(Math.random()-.5)*115,z=(Math.random()-.5)*100;
- if(z<-42||Math.abs(x)<7&&z<0)continue;
- const g=new THREE.Mesh(new THREE.ConeGeometry(.22+Math.random()*.18,.5+Math.random()*.8,4),grassMat);
- g.position.set(x,.25,z);g.rotation.z=(Math.random()-.5)*.3;scene.add(g);
-}
-
-/* KARON character v3: replace primitive toy with rigged animated Soldier.glb */
-const player=new THREE.Group();scene.add(player);
-const legs=[]; // kept empty so legacy procedural limb animation does not interfere with the rig
-const arms=[];
-let characterMixer=null;
-let characterActions={};
-let activeCharacterAction='Idle';
-const characterLoader=new GLTFLoader();
-characterLoader.load('https://threejs.org/examples/models/gltf/Soldier.glb', (gltf)=>{
- const character=gltf.scene;
- character.scale.setScalar(1.0);
- character.rotation.y=Math.PI;
- character.traverse((node)=>{
-  if(node.isMesh){node.castShadow=true;node.receiveShadow=true;}
- });
- player.add(character);
- characterMixer=new THREE.AnimationMixer(character);
- for(const clip of gltf.animations){
-  const action=characterMixer.clipAction(clip);
-  characterActions[clip.name]=action;
- }
- const idle=characterActions['Idle'] || Object.values(characterActions)[0];
- if(idle){idle.play();activeCharacterAction=idle.getClip().name;}
- message('SOLDADO 3D CARREGADO');
-}, undefined, (error)=>{
- console.error('Falha ao carregar o modelo 3D do soldado:',error);
- message('Modelo 3D não carregou — verifique a internet');
-});
-player.position.set(0,0,9);
-function setCharacterAction(name){
- if(!characterMixer)return;
- const next=characterActions[name] || characterActions['Idle'] || Object.values(characterActions)[0];
- if(!next || next.getClip().name===activeCharacterAction)return;
- const current=characterActions[activeCharacterAction];
- next.reset().fadeIn(.18).play();
- if(current)current.fadeOut(.18);
- activeCharacterAction=next.getClip().name;
-}
-
-/* targets */
-const targets=[];
-function makeTarget(x,z){
- const group=new THREE.Group();group.position.set(x,0,z);scene.add(group);
- const red=mat(0xb93d30), dark=mat(0x353a39);
- const body=new THREE.Mesh(new THREE.CapsuleGeometry(.38,.85,4,8),red);body.position.y=1.05;body.castShadow=true;group.add(body);
- const head=new THREE.Mesh(new THREE.SphereGeometry(.25,10,8),dark);head.position.y=1.85;group.add(head);
- targets.push({group,alive:true});
-}
-[[-1,-18],[18,-31],[34,1],[-24,4],[4,-39]].forEach(p=>makeTarget(...p));
-document.querySelector('#targetsText').textContent='Alvos: '+targets.length;
-
-let yaw=0, pitch=.16, moveX=0, moveY=0, moving=false, jumping=0, crouched=false, health=100;
-const joystick=document.querySelector('#joystick'),stick=document.querySelector('#stick');
-let joyPointer=null;
-function setJoy(e){
- const r=joystick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
- let dx=e.clientX-cx,dy=e.clientY-cy;const max=38,dist=Math.hypot(dx,dy);
- if(dist>max){dx=dx/dist*max;dy=dy/dist*max;}
- stick.style.transform=`translate(${dx}px,${dy}px)`;
- moveX=dx/max;moveY=dy/max;
-}
-joystick.addEventListener('pointerdown',e=>{joyPointer=e.pointerId;joystick.setPointerCapture(e.pointerId);setJoy(e);});
-joystick.addEventListener('pointermove',e=>{if(e.pointerId===joyPointer)setJoy(e);});
-function releaseJoy(){joyPointer=null;moveX=0;moveY=0;stick.style.transform='translate(0,0)';}
-joystick.addEventListener('pointerup',releaseJoy);joystick.addEventListener('pointercancel',releaseJoy);
-
-/* drag on the right half rotates the camera */
-let lookPointer=null,lastX=0,lastY=0;
-renderer.domElement.addEventListener('pointerdown',e=>{
- if(e.clientX>innerWidth*.42){lookPointer=e.pointerId;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId);}
-});
-renderer.domElement.addEventListener('pointermove',e=>{
- if(e.pointerId===lookPointer){
-  yaw+=(e.clientX-lastX)*.006;pitch=Math.max(-.1,Math.min(.65,pitch+(e.clientY-lastY)*.003));
-  lastX=e.clientX;lastY=e.clientY;
- }
-});
-renderer.domElement.addEventListener('pointerup',()=>lookPointer=null);
-renderer.domElement.addEventListener('pointercancel',()=>lookPointer=null);
-
-/* desktop keyboard */
-const keys={};
-addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.key===' ')jumping=.18;if(e.key.toLowerCase()==='c')crouched=!crouched;if(e.key.toLowerCase()==='f')shoot();});
-addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
-document.querySelector('#jump').addEventListener('pointerdown',e=>{e.preventDefault();jumping=.18;});
-document.querySelector('#crouch').addEventListener('pointerdown',e=>{e.preventDefault();crouched=!crouched;document.querySelector('#crouch').style.background=crouched?'#64864dcc':'#10182099';});
-const toast=document.querySelector('#toast');let toastTimer=0;
-function message(s){toast.textContent=s;toastTimer=2.0;}
-function shoot(){
- const origin=player.position.clone();origin.y+=1.5;
- const forward=new THREE.Vector3(Math.sin(yaw),0,-Math.cos(yaw));
- let best=null,bestDist=36;
- for(const t of targets){if(!t.alive)continue;
-  const p=t.group.position.clone().add(new THREE.Vector3(0,1.1,0)).sub(origin);
-  const along=p.dot(forward);if(along<0||along>bestDist)continue;
-  const side=p.clone().addScaledVector(forward,-along).length();
-  if(side<1.8){best=t;bestDist=along;}
- }
- const start=origin.clone().add(new THREE.Vector3(.25,.0,.35).applyAxisAngle(new THREE.Vector3(0,1,0),yaw));
- const end=best?best.group.position.clone().add(new THREE.Vector3(0,1.2,0)):origin.clone().addScaledVector(forward,28);
- const points=[start,end],geo=new THREE.BufferGeometry().setFromPoints(points);
- const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xffd27a,transparent:true,opacity:.95}));scene.add(line);
- setTimeout(()=>{scene.remove(line);geo.dispose();line.material.dispose();},100);
- if(best){best.alive=false;scene.remove(best.group);message('ALVO ATINGIDO!');}
- else message('DISPARO!');
- document.querySelector('#targetsText').textContent='Alvos: '+targets.filter(t=>t.alive).length;
-}
-document.querySelector('#fire').addEventListener('pointerdown',e=>{e.preventDefault();shoot();});
-
-const clock=new THREE.Clock();
-function animate(){
- requestAnimationFrame(animate);
- const dt=Math.min(clock.getDelta(),.04);
- let kx=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);
- let ky=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0);
- const ix=Math.abs(moveX)>.04?moveX:kx, iy=Math.abs(moveY)>.04?-moveY:ky;
- const len=Math.hypot(ix,iy);
- if(len>.05){
-  const speed=6.0*(crouched?.48:1);
-  const forward=new THREE.Vector3(Math.sin(yaw),0,-Math.cos(yaw));
-  const right=new THREE.Vector3(Math.cos(yaw),0,Math.sin(yaw));
-  const delta=forward.multiplyScalar(iy/len*speed*dt).add(right.multiplyScalar(ix/len*speed*dt));
-  const nx=player.position.x+delta.x,nz=player.position.z+delta.z;
-  const blocked=obstacles.some(o=>Math.abs(nx-o.x)<o.rx+.65&&Math.abs(nz-o.z)<o.rz+.65);
-  if(!blocked){player.position.x=THREE.MathUtils.clamp(nx,-62,62);player.position.z=THREE.MathUtils.clamp(nz,-54,42);}
-  player.rotation.y=yaw;
-  setCharacterAction(crouched?'Walk':'Run');
- }else setCharacterAction('Idle');
- if(characterMixer)characterMixer.update(dt);
- if(jumping>0){player.position.y=Math.max(0,Math.sin((.18-jumping)/.18*Math.PI)*1.25);jumping-=dt;}else player.position.y=0;
- const headHeight=crouched?1.8:2.15;
- const desired=new THREE.Vector3(
-  player.position.x-Math.sin(yaw)*8,
-  player.position.y+3.3+pitch*4,
-  player.position.z+Math.cos(yaw)*8
- );
- camera.position.lerp(desired,1-Math.exp(-5*dt));
- const look=new THREE.Vector3(player.position.x,player.position.y+headHeight,player.position.z);
- look.x+=Math.sin(yaw)*2;look.z-=Math.cos(yaw)*2;look.y+=pitch*2;
- camera.lookAt(look);
- if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)toast.textContent='';}
- renderer.render(scene,camera);
-}
-animate();
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
-</script>
-</body>
-</html>
+function update(dt){if(!started)return;elapsed+=dt;player.mp=Math.min(player.maxmp,player.mp+dt*4);player.inv=Math.max(0,player.inv-dt);let v=moveVec(),l=Math.hypot(v.x,v.y);if(l>.1){player.x+=v.x*155*dt;player.y+=v.y*155*dt;player.faceX=v.x;player.faceY=v.y}player.x=Math.max(25,Math.min(world.w-25,player.x));player.y=Math.max(25,Math.min(world.h-25,player.y));
+for(let e of enemies){if(e.hp<=0)continue;e.hit=Math.max(0,e.hit-dt);let dx=player.x-e.x,dy=player.y-e.y,d=Math.hypot(dx,dy)||1;if(d>27){e.x+=dx/d*e.speed*dt;e.y+=dy/d*e.speed*dt}else if(e.cool<=0&&player.inv<=0){player.hp-=9;e.cool=1.15;burst(player.x,player.y,'#ff6685',7);if(player.hp<=0){player.hp=0;started=false;ui('intro').classList.remove('hidden');ui('intro').querySelector('h1').textContent='VOCÊ CAIU';ui('intro').querySelector('p').textContent='As sombras venceram esta batalha. Entre novamente para tentar de novo.';ui('start').textContent='TENTAR DE NOVO';notify('Você foi derrotado.')}updateUI()}e.cool-=dt}
+for(let c of crystals){if(!c.got&&Math.hypot(player.x-c.x,player.y-c.y)<30){c.got=true;player.frags++;player.xp+=15;player.mp=Math.min(player.maxmp,player.mp+20);burst(c.x,c.y,'#6ce3ff',25);notify('Fragmento do Cristal Primordial encontrado!');if(player.frags===3){won=true;ui('win').classList.remove('hidden');notify('MISSÃO CONCLUÍDA!')}updateUI()}}
+for(let p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;p.vx*=.97;p.vy*=.97}particles=particles.filter(p=>p.life>0);if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)ui('toast').classList.remove('show')}if(Math.floor(elapsed)%5===0)updateUI()}
+function loop(t){let dt=Math.min(.033,(t-last)/1000||0);last=t;update(dt);draw();requestAnimationFrame(loop)}requestAnimationFrame(loop);
+const stickEl=ui('stick'),knob=ui('knob');function stickSet(e){let r=stickEl.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),max=r.width*.34,l=Math.hypot(dx,dy);if(l>max){dx=dx/l*max;dy=dy/l*max}stick.x=dx/max;stick.y=dy/max;knob.style.left=`${50+stick.x*34}%`;knob.style.top=`${50+stick.y*34}%`}
+stickEl.addEventListener('pointerdown',e=>{stick.active=true;stickEl.setPointerCapture(e.pointerId);stickSet(e)});stickEl.addEventListener('pointermove',e=>{if(stick.active)stickSet(e)});function endStick(){stick.active=false;stick.x=0;stick.y=0;knob.style.left='50%';knob.style.top='50%'}stickEl.addEventListener('pointerup',endStick);stickEl.addEventListener('pointercancel',endStick);
+ui('spell').addEventListener('click',()=>cast(false));ui('pulse').addEventListener('click',()=>cast(true));ui('dash').addEventListener('click',dodge);ui('potion').addEventListener('click',potion);addEventListener('keydown',e=>{keys[e.key]=true;if(e.key===' '){e.preventDefault();cast(false)}if(e.key==='Shift')dodge();if(e.key==='q')cast(true)});addEventListener('keyup',e=>keys[e.key]=false);
+ui('start').addEventListener('click',()=>{reset();started=true;ui('intro').classList.add('hidden');ui('win').classList.add('hidden');ui('tip').textContent='Encontre os cristais azuis • Magia ataca à sua frente • Explosão atinge ao redor';notify('A floresta de Éterion espera por você!')});ui('again').addEventListener('click',()=>{ui('win').classList.add('hidden');notify('Explore o reino e ganhe experiência!')});
+reset();draw();
+})();
+</script></body></html>
