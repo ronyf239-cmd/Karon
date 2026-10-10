@@ -183,7 +183,7 @@ renderer.domElement.addEventListener('pointerdown',e=>{
 });
 renderer.domElement.addEventListener('pointermove',e=>{
  if(e.pointerId===lookPointer){
-  yaw-=(e.clientX-lastX)*.006;pitch=Math.max(-.1,Math.min(.65,pitch+(e.clientY-lastY)*.003));
+  yaw+=(e.clientX-lastX)*.006;pitch=Math.max(-.1,Math.min(.65,pitch+(e.clientY-lastY)*.003));
   lastX=e.clientX;lastY=e.clientY;
  }
 });
