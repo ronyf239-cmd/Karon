@@ -48,6 +48,7 @@
 </div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
 
 const root=document.querySelector('#game');
 const scene=new THREE.Scene();
@@ -130,75 +131,44 @@ for(let i=0;i<180;i++){
  g.position.set(x,.25,z);g.rotation.z=(Math.random()-.5)*.3;scene.add(g);
 }
 
-/* KARON player: upgraded modular tactical character; keep existing controls and shooting */
+/* KARON character v3: replace primitive toy with rigged animated Soldier.glb */
 const player=new THREE.Group();scene.add(player);
-const skin=mat(0xb7835d), shirt=mat(0x303b36), pants=mat(0x292e2b),
-      gear=mat(0x57513d), gearDark=mat(0x373a31), helmet=mat(0x202a2b),
-      bootMat=mat(0x171b1a), metal=mat(0x171c1d), strapMat=mat(0x292d27);
-function part(geo,material,x,y,z,parent=player){
- const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);
- m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
-}
-function detailBox(w,h,d,material,x,y,z,rx=0,ry=0,rz=0,parent=player){
- const m=part(new THREE.BoxGeometry(w,h,d),material,x,y,z,parent);
- m.rotation.set(rx,ry,rz);return m;
-}
-function limb(material,x,y,z,rx=0,rz=0){
- const m=part(new THREE.CapsuleGeometry(.13,.43,4,7),material,x,y,z);
- m.rotation.x=rx;m.rotation.z=rz;return m;
-}
-/* torso and tactical vest */
-part(new THREE.CapsuleGeometry(.38,.68,5,10),shirt,0,1.48,0);
-part(new THREE.BoxGeometry(.72,.74,.35),gear,0,1.52,.13);
-detailBox(.18,.76,.07,strapMat,-.22,1.55,.325,0,0,-.08);
-detailBox(.18,.76,.07,strapMat,.22,1.55,.325,0,0,.08);
-detailBox(.53,.12,.06,gearDark,0,1.83,.34);
-detailBox(.26,.18,.07,gearDark,0,1.42,.35);
-for(const x of [-.25,-.09,.09,.25]){
- detailBox(.12,.19,.13,gearDark,x,1.49,.365,0,0,(x*-.22));
- detailBox(.11,.13,.12,gear,x,1.25,.33);
-}
-/* backpack, top flap, side pockets and straps */
-detailBox(.62,.72,.30,gear,-.02,1.68,-.36);
-detailBox(.54,.15,.32,gearDark,-.02,2.07,-.36);
-detailBox(.16,.43,.18,gearDark,-.36,1.63,-.34);
-detailBox(.16,.43,.18,gearDark,.32,1.63,-.34);
-detailBox(.48,.08,.04,strapMat,-.02,1.81,-.195);
-/* head, neck, helmet shell, rim and visor */
-part(new THREE.CylinderGeometry(.13,.15,.18,8),skin,0,1.99,0);
-part(new THREE.SphereGeometry(.27,14,12),skin,0,2.20,.025);
-part(new THREE.SphereGeometry(.30,14,10,0,Math.PI*2,0,Math.PI*.62),helmet,0,2.34,0);
-part(new THREE.CylinderGeometry(.305,.305,.055,14),helmet,0,2.27,0);
-detailBox(.47,.10,.13,helmet,0,2.23,.245);
-detailBox(.35,.045,.04,gearDark,0,2.17,.29);
-/* arms with sleeves, elbow pads and gloves */
+const legs=[]; // kept empty so legacy procedural limb animation does not interfere with the rig
 const arms=[];
-for(const side of [-1,1]){
- const upper=part(new THREE.CapsuleGeometry(.14,.38,4,7),shirt,side*.48,1.58,.10);
- upper.rotation.z=side*-.22;
- const elbow=part(new THREE.SphereGeometry(.145,8,7),gearDark,side*.56,1.39,.16);
- const fore=part(new THREE.CapsuleGeometry(.12,.34,4,7),shirt,side*.51,1.27,.24);
- fore.rotation.x=-.48;fore.rotation.z=side*.08;
- part(new THREE.SphereGeometry(.12,8,7),bootMat,side*.50,1.10,.32);
- arms.push({upper,fore});
-}
-/* trousers, articulated-looking knee pads and boots */
-const legs=[];
-for(const side of [-1,1]){
- const leg=part(new THREE.CapsuleGeometry(.17,.56,4,8),pants,side*.21,.65,0);
- legs.push(leg);
- part(new THREE.SphereGeometry(.17,8,7),gearDark,side*.21,.62,.14);
- detailBox(.27,.17,.43,bootMat,side*.21,.18,.13,-.05);
- detailBox(.24,.07,.40,gearDark,side*.21,.105,.13);
-}
-/* rifle held across the front */
-const rifle=new THREE.Group();player.add(rifle);
-detailBox(.13,.13,.68,metal,.23,1.36,.55,0,-.08,0,rifle);
-detailBox(.17,.19,.24,gearDark,.23,1.34,.32,0,0,0,rifle);
-detailBox(.10,.28,.12,metal,.23,1.18,.40,-.20,0,0,rifle);
-detailBox(.055,.08,.40,metal,.23,1.46,.65,0,0,0,rifle);
-detailBox(.06,.06,.17,gearDark,.23,1.49,.40,0,0,0,rifle);
+let characterMixer=null;
+let characterActions={};
+let activeCharacterAction='Idle';
+const characterLoader=new GLTFLoader();
+characterLoader.load('https://threejs.org/examples/models/gltf/Soldier.glb', (gltf)=>{
+ const character=gltf.scene;
+ character.scale.setScalar(1.0);
+ character.rotation.y=Math.PI;
+ character.traverse((node)=>{
+  if(node.isMesh){node.castShadow=true;node.receiveShadow=true;}
+ });
+ player.add(character);
+ characterMixer=new THREE.AnimationMixer(character);
+ for(const clip of gltf.animations){
+  const action=characterMixer.clipAction(clip);
+  characterActions[clip.name]=action;
+ }
+ const idle=characterActions['Idle'] || Object.values(characterActions)[0];
+ if(idle){idle.play();activeCharacterAction=idle.getClip().name;}
+ message('SOLDADO 3D CARREGADO');
+}, undefined, (error)=>{
+ console.error('Falha ao carregar o modelo 3D do soldado:',error);
+ message('Modelo 3D não carregou — verifique a internet');
+});
 player.position.set(0,0,9);
+function setCharacterAction(name){
+ if(!characterMixer)return;
+ const next=characterActions[name] || characterActions['Idle'] || Object.values(characterActions)[0];
+ if(!next || next.getClip().name===activeCharacterAction)return;
+ const current=characterActions[activeCharacterAction];
+ next.reset().fadeIn(.18).play();
+ if(current)current.fadeOut(.18);
+ activeCharacterAction=next.getClip().name;
+}
 
 /* targets */
 const targets=[];
@@ -234,7 +204,7 @@ renderer.domElement.addEventListener('pointerdown',e=>{
 });
 renderer.domElement.addEventListener('pointermove',e=>{
  if(e.pointerId===lookPointer){
-  yaw-=(e.clientX-lastX)*.006;pitch=Math.max(-.1,Math.min(.65,pitch+(e.clientY-lastY)*.003));
+  yaw+=(e.clientX-lastX)*.006;pitch=Math.max(-.1,Math.min(.65,pitch+(e.clientY-lastY)*.003));
   lastX=e.clientX;lastY=e.clientY;
  }
 });
@@ -287,9 +257,9 @@ function animate(){
   const blocked=obstacles.some(o=>Math.abs(nx-o.x)<o.rx+.65&&Math.abs(nz-o.z)<o.rz+.65);
   if(!blocked){player.position.x=THREE.MathUtils.clamp(nx,-62,62);player.position.z=THREE.MathUtils.clamp(nz,-54,42);}
   player.rotation.y=yaw;
-  legs.forEach((l,i)=>{l.rotation.x=Math.sin(performance.now()*.012+i*Math.PI)*.45;});
-  arms.forEach((a,i)=>{a.upper.rotation.x=Math.sin(performance.now()*.012+i*Math.PI)*.12;});
- }else legs.forEach(l=>l.rotation.x=THREE.MathUtils.damp(l.rotation.x,0,7,dt));
+  setCharacterAction(crouched?'Walk':'Run');
+ }else setCharacterAction('Idle');
+ if(characterMixer)characterMixer.update(dt);
  if(jumping>0){player.position.y=Math.max(0,Math.sin((.18-jumping)/.18*Math.PI)*1.25);jumping-=dt;}else player.position.y=0;
  const headHeight=crouched?1.8:2.15;
  const desired=new THREE.Vector3(
